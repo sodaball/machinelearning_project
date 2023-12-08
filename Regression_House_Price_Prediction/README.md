@@ -64,7 +64,7 @@ print(test_data.info())
 
 #### 3. 归一化(可选)
 
-（针对连续型的数值型数据），可以使用`sklearn.processing.MinMaxScaler`
+（针对连续型的数值型数据），可以使用`sklearn.processing.MinMaxScaler`或者`sklearn.preprocessing.StandardScaler()`
 
 
 
