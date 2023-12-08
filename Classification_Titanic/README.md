@@ -101,8 +101,10 @@ test数据集中Cabin列大量缺失，Fare列少量缺失
 
 #### 4. 划分数据集
 
+可使用train_test_split函数
+
 ```python
-X_train,X_test,Y_train,Y_test= train_test_split(X,Y,test_size=0.1, random_state=0)
+X_train,X_test,Y_train,Y_test= train_test_split(X,Y,test_size=<split_size>, random_state=0)
 ```
 
 
