@@ -5,6 +5,9 @@ import pandas as pd
 train_data = pd.read_csv('./data/train.csv', encoding='utf-8')
 test_data = pd.read_csv('./data/test.csv', encoding='utf-8')
 
+# 打印数据
+print(train_data.head(10))
+
 # 查看是否有缺失值
 print(train_data.info())
 print('-' * 30)
@@ -54,3 +57,52 @@ test_data = age_predict(test_data)
 print(train_data.info())
 print('-' * 30)
 print(test_data.info())
+
+# 数据编码
+from sklearn.preprocessing import LabelEncoder
+labelEncoder = LabelEncoder()
+train_data['Pclass'] = labelEncoder.fit_transform(train_data['Pclass'])
+train_data['Name'] = labelEncoder.fit_transform(train_data['Name'])
+train_data['Sex'] = labelEncoder.fit_transform(train_data['Sex'])
+train_data['Ticket'] = labelEncoder.fit_transform(train_data['Ticket'])
+train_data['Cabin'] = labelEncoder.fit_transform(train_data['Cabin'])
+train_data['Embarked'] = labelEncoder.fit_transform(train_data['Embarked'])
+
+# 打印编码后的数据
+print("\nafter encoding:")
+print(train_data.head(10))
+
+# 数据归一化
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+# 对 Age 和 Fare 列进行归一化，因为这两列的数值范围较大
+train_data['Age'] = scaler.fit_transform(train_data['Age'].values.reshape(-1, 1))
+train_data['Fare'] = scaler.fit_transform(train_data['Fare'].values.reshape(-1, 1))
+
+# 打印归一化后的数据
+print("\nafter normalization:")
+print(train_data.head(10))
+
+# 保存处理后的数据
+# 创建文件夹
+import os
+if not os.path.exists('./data_fixed'):
+    os.mkdir('./data_fixed')
+# 保存文件
+train_data.to_csv('./data_fixed/train_processed.csv', index=False)
+test_data.to_csv('./data_fixed/test_processed.csv', index=False)
+
+'''
+1. **PassengerId（乘客ID）:** 乘客在数据集中的唯一标识。
+2. **Survived（是否幸存）:** 目标变量，表示乘客是否在泰坦尼克号沉没事件中幸存。1表示幸存，0表示未幸存。
+3. **Pclass（舱位等级）:** 乘客所在的舱位等级，有三个值：1st（上层）、2nd（中层）、3rd（下层）。
+4. **Name（姓名）:** 乘客的姓名。
+5. **Sex（性别）:** 乘客的性别，值为 "male"（男性）或 "female"（女性）。
+6. **Age（年龄）:** 乘客的年龄。可能包含缺失值。
+7. **SibSp（同辈亲属数量）:** 乘客在船上有多少兄弟姐妹或配偶。
+8. **Parch（非同辈亲属数量）:** 乘客在船上有多少父母或子女。
+9. **Ticket（船票号码）:** 乘客的船票号码。
+10. **Fare（票价）:** 乘客支付的船票费用。
+11. **Cabin（客舱号码）:** 乘客的客舱号码。可能包含缺失值。
+12. **Embarked（登船港口）:** 乘客登船的港口，有三个值：C（瑟堡）、Q（皇后镇）、S（南安普顿）。可能包含缺失值。
+'''

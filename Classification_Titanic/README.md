@@ -77,13 +77,15 @@ test数据集中Cabin列大量缺失，Fare列少量缺失
 
 * 映射为唯一的整数。可以使用`sklearn.processing.LabelEncoder()`,每个不同的类别都被映射为一个唯一的整数值。但是，`LabelEncoder` 会在对具有大小关系的类别进行编码时引入错误的大小关系
 
-* 映射为独热码。若某些非数值数据具有大小关系，如"small"、"big"，此时应该使用One-Hot Encoding
+* 映射为独热码。若某些非数值数据具有大小关系，如"small"、"big"，此时应该使用One-Hot Encoding。但是若使用 OneHotEncoder，会导致特征数量过多，可能影响模型训练速度
 
 
 
 #### 3. 归一化(可选)
 
-（针对连续型的数值型数据），可以使用`sklearn.processing.MinMaxScaler`
+（针对连续型的数值型数据），对 Age 和 Fare 列进行归一化，因为这两列的数值范围较大。
+
+可以使用`sklearn.processing.MinMaxScaler`或者`sklearn.preprocessing.StandardScaler()`
 
 
 

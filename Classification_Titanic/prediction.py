@@ -5,3 +5,8 @@ import pandas as pd
 train_data = pd.read_csv('./data/train.csv', encoding='utf-8')
 test_data = pd.read_csv('./data/test.csv', encoding='utf-8')
 
+# 数据集划分
+X_train = train_data.drop(['PassengerId', 'Survived'], axis=1)
+Y_train = train_data['Survived']
+X_test = test_data.drop(['PassengerID'], axis=1)    # axis=1 表示删除列
+Y_test = test_data['Survived']
