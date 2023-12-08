@@ -43,8 +43,10 @@ test_data['Cabin'] = test_data['Cabin'].apply(lambda x: 0 if pd.isnull(x) else 1
 
 # 处理 Embarked 列的缺失值，用众数填充
 train_data['Embarked'].fillna(train_data['Embarked'].mode()[0], inplace=True)
+test_data['Embarked'].fillna(test_data['Embarked'].mode()[0], inplace=True)
 
 # 处理 Fare 列的缺失值，用均值填充
+train_data['Fare'].fillna(train_data['Fare'].mean(), inplace=True)
 test_data['Fare'].fillna(test_data['Fare'].mean(), inplace=True)
 
 # 处理 Age 列的缺失值，使用其他列的数据预测 Age 列的缺失值
@@ -68,6 +70,13 @@ train_data['Ticket'] = labelEncoder.fit_transform(train_data['Ticket'])
 train_data['Cabin'] = labelEncoder.fit_transform(train_data['Cabin'])
 train_data['Embarked'] = labelEncoder.fit_transform(train_data['Embarked'])
 
+test_data['Pclass'] = labelEncoder.fit_transform(test_data['Pclass'])
+test_data['Name'] = labelEncoder.fit_transform(test_data['Name'])
+test_data['Sex'] = labelEncoder.fit_transform(test_data['Sex'])
+test_data['Ticket'] = labelEncoder.fit_transform(test_data['Ticket'])
+test_data['Cabin'] = labelEncoder.fit_transform(test_data['Cabin'])
+test_data['Embarked'] = labelEncoder.fit_transform(test_data['Embarked'])
+
 # 打印编码后的数据
 print("\nafter encoding:")
 print(train_data.head(10))
@@ -78,6 +87,8 @@ scaler = StandardScaler()
 # 对 Age 和 Fare 列进行归一化，因为这两列的数值范围较大
 train_data['Age'] = scaler.fit_transform(train_data['Age'].values.reshape(-1, 1))
 train_data['Fare'] = scaler.fit_transform(train_data['Fare'].values.reshape(-1, 1))
+test_data['Age'] = scaler.fit_transform(test_data['Age'].values.reshape(-1, 1))
+test_data['Fare'] = scaler.fit_transform(test_data['Fare'].values.reshape(-1, 1))
 
 # 打印归一化后的数据
 print("\nafter normalization:")
