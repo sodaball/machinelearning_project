@@ -64,7 +64,8 @@ rf.fit(X_train, Y_train)
 # 打印回归的评价指标，包括平均绝对误差、均方误差、R2得分、解释方差得分
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, explained_variance_score
 Y_pred = rf.predict(X_test)
-print("\nMean Absolute Error: ", mean_absolute_error(Y_test, Y_pred))
+print("before GridSearchCV:")
+print("Mean Absolute Error: ", mean_absolute_error(Y_test, Y_pred))
 print("Mean Squared Error: ", mean_squared_error(Y_test, Y_pred))
 print("R2 Score: ", r2_score(Y_test, Y_pred))
 print("Explained Variance Score: ", explained_variance_score(Y_test, Y_pred))
@@ -73,8 +74,8 @@ print("Explained Variance Score: ", explained_variance_score(Y_test, Y_pred))
 from sklearn.model_selection import GridSearchCV
 from sklearn.ensemble import RandomForestRegressor
 rf = RandomForestRegressor()
-param_grid = {'n_estimators': range(10, 100, 10), 'max_depth': range(3, 14, 2), 'min_samples_split': range(50, 201, 20)}
-grid = GridSearchCV(rf, param_grid, cv=5)   # 这一步的作用是选择最优参数，但是这里的cv=5是5折交叉验证
+param_grid = {'n_estimators': range(100, 500, 50), 'max_depth': range(10, 100, 20), 'min_samples_split': range(10, 100, 20)}
+grid = GridSearchCV(rf, param_grid, cv=2, verbose=2, n_jobs=12)   # 这一步的作用是选择最优参数，但是这里的cv=3是3折交叉验证, n_jobs是并行数
 grid.fit(X_train, Y_train)  # q:训练的是回归模型
 print(grid.best_params_)    # 打印最优参数
 

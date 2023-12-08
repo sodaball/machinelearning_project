@@ -74,6 +74,18 @@ X_train,X_test,Y_train,Y_test= train_test_split(X,Y,test_size=0.1, random_state=
 
 比如使用随机森林回归模型，可以使用GridSearchCV选择最优参数
 
+搜索过程比较慢，可以调整搜索的范围和步长，还可以并行搜索，添加参数`n_jobs=8`
+
+```python
+grid = GridSearchCV(rf, param_grid, cv=2, verbose=2, n_jobs=<num_threads>)   # 这一步的作用是选择最优参数, 但是这里的cv=3是3折交叉验证, n_jobs是并行数
+```
+
+最佳参数：
+
+![params](images/params.png)
+
+
+
 
 
 #### 6. 打印评价指标
@@ -84,3 +96,13 @@ X_train,X_test,Y_train,Y_test= train_test_split(X,Y,test_size=0.1, random_state=
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, explained_variance_score
 ```
 
+
+
+使用GridSearchCV进行参数搜索前后的指标对比：
+
+| metrics | before gridsearchcv | after GridSearchCV |
+| ------- | ------------------- | ------------------ |
+| Mean Absolute Error | 138.28 | 136.25 |
+| Mean Squared Error | 49238.01 | 46697.74 |
+| R2 Score | 0.71 | 0.70 |
+| Explained Variance Score | 0.77 | 0.79 |
