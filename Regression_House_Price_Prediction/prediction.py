@@ -3,11 +3,14 @@ import pandas as pd
 
 train_data = pd.read_csv('./data/train_data.csv', encoding='utf-8')
 test_data = pd.read_csv('./data/test_data.csv', encoding='utf-8')
+<<<<<<< HEAD
 
 # 查看是否有缺失值
 print(train_data.info())
 print('-' * 30)
 print(test_data.info())
+=======
+>>>>>>> e3a065b87866b4c7025e3f109aee814cef51e936
 
 # 打印数据的前5行
 print("train_data:")
