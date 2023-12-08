@@ -89,8 +89,8 @@ import os
 if not os.path.exists('./data_fixed'):
     os.mkdir('./data_fixed')
 # 保存文件
-train_data.to_csv('./data_fixed/train_processed.csv', index=False)
-test_data.to_csv('./data_fixed/test_processed.csv', index=False)
+train_data.to_csv('./data_fixed/train.csv', index=False)
+test_data.to_csv('./data_fixed/test.csv', index=False)
 
 '''
 1. **PassengerId（乘客ID）:** 乘客在数据集中的唯一标识。
