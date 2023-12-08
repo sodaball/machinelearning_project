@@ -1,8 +1,13 @@
 from sklearn import preprocessing
 import pandas as pd
 
-train_data = pd.read_csv('train_data.csv', encoding='utf-8')
-test_data = pd.read_csv('test_data.csv', encoding='utf-8')
+train_data = pd.read_csv('./data/train_data.csv', encoding='utf-8')
+test_data = pd.read_csv('./data/test_data.csv', encoding='utf-8')
+
+# 查看是否有缺失值
+print(train_data.info())
+print('-' * 30)
+print(test_data.info())
 
 # 打印数据的前5行
 print("train_data:")
