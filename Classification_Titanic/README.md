@@ -91,7 +91,11 @@ test数据集中Cabin列大量缺失，Fare列少量缺失
 
 处理前后的数据：
 
-![data_processing](Q:\Dauhau_data_学习资料\互助群\机器学习\machinelearning_homework\Regression_House_Price_Prediction\images\data_processing.png)
+<img src="images/data_fixed_view.png" alt="data_fixed_view" style="zoom:50%;" />
+
+
+
+也可以使用sklearn自带的特征工程函数来完成以上**缺失值处理、编码、归一化等**操作。
 
 
 
@@ -105,20 +109,10 @@ X_train,X_test,Y_train,Y_test= train_test_split(X,Y,test_size=0.1, random_state=
 
 #### 5. 训练，拟合
 
-比如使用随机森林回归模型，可以使用GridSearchCV选择最优参数
-
-搜索过程比较慢，可以调整搜索的范围和步长，还可以并行搜索，添加参数`n_jobs=8`
-
-```python
-grid = GridSearchCV(rf, param_grid, cv=2, verbose=2, n_jobs=<num_threads>)   # 这一步的作用是选择最优参数, 但是这里的cv=3是3折交叉验证, n_jobs是并行数
-```
-
-最佳参数：
-
-![params](Q:\Dauhau_data_学习资料\互助群\机器学习\machinelearning_homework\Regression_House_Price_Prediction\images\params.png)
+使用sklearn的逻辑回归
 
 
 
+#### 6. 输出预测结果，不计算指标，因无标准答案
 
-
-#### 6. 打印评价指标
+![result](images/predict_result.png)
