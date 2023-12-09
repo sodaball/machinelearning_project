@@ -1,5 +1,1 @@
-Classification_fashion_mnist/data/t10k-images.npy
-Classification_fashion_mnist/data/t10k-labels.npy
-Classification_fashion_mnist/data/train-images.npy
-Classification_fashion_mnist/data/train-labels.npy
-Classification_fashion_mnist/data/fashion-mnist.zip
+Classification_fashion_mnist/data
