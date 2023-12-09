@@ -1,1 +1,2 @@
-Classification_fashion_mnist/data
+Classification_fashion_mnist/data/*
+!Classification_fashion_mnist/data/
