@@ -40,7 +40,9 @@ test数据共有11列， 比train少了survival列
 
 #### 1. 数据读取
 
-使用pandas
+.npy文件，用`np.load()`读取
+
+.csv文件，用`pd.read_csv`读取
 
 #### 2. 数据校验
 
