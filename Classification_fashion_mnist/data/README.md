@@ -1,0 +1,1 @@
+首先解压该目录下的fashion-mnist.zip文件于本文件夹中
