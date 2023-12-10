@@ -102,3 +102,20 @@ def train():
 
 
 
+错误：
+
+```
+遇到的错误涉及到模型预测（outputs）和目标标签（labels）在计算损失时的数据类型不匹配。CrossEntropyLoss 期望目标标签的数据类型为 torch.long，但似乎 labels 变量的数据类型为 torch.ByteTensor。
+
+你可以通过在使用标签进行损失计算之前将其显式转换为正确的数据类型来解决此问题。你可以使用 .long() 方法执行此转换。
+```
+
+解决：
+
+```python
+labels = labels.long().to(device)
+
+```
+
+
+
