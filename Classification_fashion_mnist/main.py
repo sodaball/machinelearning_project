@@ -103,7 +103,7 @@ def test():
             correct += (predicted == labels).sum().item()   # 记录正确的个数
         print('Accuracy of the network on the 10000 test images: {} %'.format(100 * correct / total))
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # 如果模块是被直接运行的，则代码块被运行，如果模块是被导入的，则代码块不被运行
     print("Executing training...")
     train()
     print("Executing testing...")
