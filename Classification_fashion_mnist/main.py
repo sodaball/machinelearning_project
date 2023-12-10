@@ -10,22 +10,17 @@ import os
 # 定义超参数
 num_epochs = 10
 num_classes = 10
-batch_size = 64
+batch_size = 100
 learning_rate = 0.001
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print("use device: ", device)
 
 # 读取npy数据
-train_images = np.load('./data/train-images.npy')
-train_labels = np.load('./data/train-labels.npy')
-test_images = np.load('./data/t10k-images.npy')
-test_labels = np.load('./data/t10k-labels.npy')
-
-# print("shape of train_images: ", train_images.shape)
-# print("shape of train_labels: ", train_labels.shape)
-# print("shape of test_images: ", test_images.shape)
-# print("shape of test_labels: ", test_labels.shape)
+train_images = np.load('./data/train-images.npy')   # shape为(60000, 784)
+train_labels = np.load('./data/train-labels.npy')   # shape为(60000,)
+test_images = np.load('./data/t10k-images.npy') # shape为(10000, 784)
+test_labels = np.load('./data/t10k-labels.npy') # shape为(10000,)
 
 # 输入的tran_images, train_labels, test_images, test_labels已经为numpy格式
 # 继承pytorch的Dataset，用于处理fashion-mnist数据集
@@ -74,9 +69,6 @@ def train():
             images = images.float().to(device)  # 将数据加载到device中
             labels = labels.to(device)  # 将数据加载到device中
 
-            print("images.shape: ", images.shape)
-            print("labels.shape: ", labels.shape)
-
             # 前向传播
             outputs = model(images) # outputs的shape为(batch_size, 10)
             loss = criterion(outputs, labels)
@@ -86,7 +78,7 @@ def train():
             loss.backward() # 反向传播计算梯度
             optimizer.step()    # 更新参数
 
-            if (i+1) % 100 == 0:    # 每100个batch打印一次日志
+            if (i+1) % 10 == 0:    # 每1个batch打印一次日志
                 print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'
                     .format(epoch+1, num_epochs, i+1, total_step, loss.item()))
     
@@ -112,5 +104,7 @@ def test():
         print('Accuracy of the network on the 10000 test images: {} %'.format(100 * correct / total))
 
 if __name__ == '__main__':
+    print("Executing training...")
     train()
+    print("Executing testing...")
     test()
