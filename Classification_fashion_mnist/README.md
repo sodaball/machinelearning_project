@@ -30,8 +30,75 @@ FashionMNIST 的大小、格式和训练集/测试集划分与原始的 MNIST �
 
 ## 步骤：
 
-#### 1. 读取数据
+### 错误记录
 
-.npy文件，用`np.load()`读取
+错误一：
 
-.csv文件，用`pd.read_csv`读取
+模型的权重是`FloatTensor`类型，但输入数据是`LongTensor`类型
+
+```python
+# 训练模型
+def train():
+    total_step = len(train_loader)  # 计算总共有多少个batch
+    for epoch in range(num_epochs):
+        for i, (images, labels) in enumerate(train_loader): # 用enumerate()函数将train_loader转换成索引-数据对
+            images = images.to(device)  # 将数据加载到device中
+            labels = labels.to(device)  # 将数据加载到device中
+
+            print("images.shape: ", images.shape)
+            print("labels.shape: ", labels.shape)
+
+            # 前向传播
+            outputs = model(images) # outputs的shape为(batch_size, 10)
+            loss = criterion(outputs, labels)
+
+            # 反向传播和优化
+            optimizer.zero_grad()   # 将梯度归零
+            loss.backward() # 反向传播计算梯度
+            optimizer.step()    # 更新参数
+
+            if (i+1) % 100 == 0:    # 每100个batch打印一次日志
+                print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'
+                    .format(epoch+1, num_epochs, i+1, total_step, loss.item()))
+    
+    # 保存模型
+    if not os.path.exists('./model'):  # 如果./model文件夹不存在，则创建
+        os.makedirs('./model')
+    torch.save(model.state_dict(), './model/model.ckpt')   # 保存模型参数
+```
+
+在输入image时加上`.float()`，修正后的代码：
+
+```python
+# 训练模型
+def train():
+    total_step = len(train_loader)  # 计算总共有多少个batch
+    for epoch in range(num_epochs):
+        for i, (images, labels) in enumerate(train_loader): # 用enumerate()函数将train_loader转换成索引-数据对
+            images = images.float().to(device)  # 将数据加载到device中
+            labels = labels.to(device)  # 将数据加载到device中
+
+            print("images.shape: ", images.shape)
+            print("labels.shape: ", labels.shape)
+
+            # 前向传播
+            outputs = model(images) # outputs的shape为(batch_size, 10)
+            loss = criterion(outputs, labels)
+
+            # 反向传播和优化
+            optimizer.zero_grad()   # 将梯度归零
+            loss.backward() # 反向传播计算梯度
+            optimizer.step()    # 更新参数
+
+            if (i+1) % 100 == 0:    # 每100个batch打印一次日志
+                print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'
+                    .format(epoch+1, num_epochs, i+1, total_step, loss.item()))
+    
+    # 保存模型
+    if not os.path.exists('./model'):  # 如果./model文件夹不存在，则创建
+        os.makedirs('./model')
+    torch.save(model.state_dict(), './model/model.ckpt')   # 保存模型参数
+```
+
+
+

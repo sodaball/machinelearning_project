@@ -22,16 +22,19 @@ train_labels = np.load('./data/train-labels.npy')
 test_images = np.load('./data/t10k-images.npy')
 test_labels = np.load('./data/t10k-labels.npy')
 
-print("shape of train_images: ", train_images.shape)
-print("shape of train_labels: ", train_labels.shape)
-print("shape of test_images: ", test_images.shape)
-print("shape of test_labels: ", test_labels.shape)
+# print("shape of train_images: ", train_images.shape)
+# print("shape of train_labels: ", train_labels.shape)
+# print("shape of test_images: ", test_images.shape)
+# print("shape of test_labels: ", test_labels.shape)
 
 # 输入的tran_images, train_labels, test_images, test_labels已经为numpy格式
 # 继承pytorch的Dataset，用于处理fashion-mnist数据集
 class FashionMNISTDataset(Dataset):
     def __init__(self, images, labels, transform=None):
-        self.images = images
+        # 定义的CNN模型的输入为(batch_size, 1, 28, 28)
+        # images的shape为torch.Size([bachsize, 784]), labels的shape为torch.Size([bachsize])
+        # 需要将images的shape转换为torch.Size([bachsize, 1, 28, 28])
+        self.images = images.reshape(-1, 1, 28, 28) # -1表示该维度由其他维度推断得到
         self.labels = labels
         self.transform = transform
 
@@ -64,46 +67,50 @@ criterion = nn.CrossEntropyLoss()   # 交叉熵损失函数
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)    # Adam优化器
 
 # 训练模型
-total_step = len(train_loader)  # 计算batch数量
+def train():
+    total_step = len(train_loader)  # 计算总共有多少个batch
+    for epoch in range(num_epochs):
+        for i, (images, labels) in enumerate(train_loader): # 用enumerate()函数将train_loader转换成索引-数据对
+            images = images.float().to(device)  # 将数据加载到device中
+            labels = labels.to(device)  # 将数据加载到device中
 
-for epoch in range(num_epochs):
-    for i, (images, labels) in enumerate(train_loader):    # 从train_loader中获取一个batch的数据
-        # 将数据加载到device中
-        images = images.to(device)
-        labels = labels.to(device)
+            print("images.shape: ", images.shape)
+            print("labels.shape: ", labels.shape)
 
-        # 前向传播
-        outputs = model(images)
-        loss = criterion(outputs, labels)   # 计算损失函数
+            # 前向传播
+            outputs = model(images) # outputs的shape为(batch_size, 10)
+            loss = criterion(outputs, labels)
 
-        # 反向传播和优化
-        optimizer.zero_grad()   # 梯度清零
-        loss.backward() # 反向传播
-        optimizer.step()    # 优化器更新参数
+            # 反向传播和优化
+            optimizer.zero_grad()   # 将梯度归零
+            loss.backward() # 反向传播计算梯度
+            optimizer.step()    # 更新参数
 
-        if (i+1) % 100 == 0:    # 每100个batch打印一次信息
-            print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'
-                  .format(epoch+1, num_epochs, i+1, total_step, loss.item()))
+            if (i+1) % 100 == 0:    # 每100个batch打印一次日志
+                print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'
+                    .format(epoch+1, num_epochs, i+1, total_step, loss.item()))
+    
+    # 保存模型
+    if not os.path.exists('./model'):  # 如果./model文件夹不存在，则创建
+        os.makedirs('./model')
+    torch.save(model.state_dict(), './model/model.ckpt')   # 保存模型参数
 
 # 测试模型
-model.eval()    # 模型转为评估模式
-with torch.no_grad():   # 不计算梯度
-    correct = 0
-    total = 0
-    for images, labels in test_loader:  # 从test_loader中获取一个batch的数据
-        # 将数据加载到device中
-        images = images.to(device)
-        labels = labels.to(device)
+def test():
+    model.load_state_dict(torch.load('./model/model.ckpt'))   # 加载模型参数
+    model.eval()    # 将模型设置为评估模式，即计算过程中不要dropout和batch normalization
+    with torch.no_grad():   # 不计算梯度
+        correct = 0
+        total = 0
+        for images, labels in test_loader:
+            images = images.to(device)  # 将数据加载到device中
+            labels = labels.to(device)  # 将数据加载到device中
+            outputs = model(images)
+            _, predicted = torch.max(outputs.data, dim=1) # 取得分最高的那个类
+            total += labels.size(0) # labels.size(0)为batch_size
+            correct += (predicted == labels).sum().item()   # 记录正确的个数
+        print('Accuracy of the network on the 10000 test images: {} %'.format(100 * correct / total))
 
-        # 前向传播
-        outputs = model(images) # outputs的shape为(batch_size, 10)
-        _, predicted = torch.max(outputs.data, dim=1) # 获取每一行的最大值和最大值的索引, predicted的shape为(batch_size, 1)
-        total += labels.size(0) # labels.size(0)为batch_size
-        correct += (predicted == labels).sum().item()   # 判断预测值和真实值是否相等，相等为1，不相等为0，最后求和
-
-    print('Accuracy of the network on the 10000 test images: {} %'.format(100 * correct / total))
-
-# 保存模型
-if os.path.exists('./model') is False:
-    os.mkdir('./model')
-torch.save(model.state_dict(), './model/model.ckpt')  # 保存模型参数
+if __name__ == '__main__':
+    train()
+    test()
