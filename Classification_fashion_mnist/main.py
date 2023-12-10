@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
-from model import CNN   # 导入model.py中定义的CNN类
+from model import CNN_model   # 导入model.py中定义的CNN类
 import os
 
 # 定义超参数
@@ -14,6 +14,7 @@ batch_size = 100
 learning_rate = 0.001
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+# device = torch.device('cpu')
 print("use device: ", device)
 
 # 读取npy数据
@@ -55,7 +56,8 @@ train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=
 test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
 
 # 定义网络模型
-model = CNN().to(device)    # 将模型加载到device中，即加载到GPU或CPU中
+model = CNN_model().to(device)    # 将模型加载到device中，即加载到GPU或CPU中
+print(model)
 
 # 定义损失函数和优化器
 criterion = nn.CrossEntropyLoss()   # 交叉熵损失函数
@@ -67,11 +69,14 @@ def train():
     for epoch in range(num_epochs):
         for i, (images, labels) in enumerate(train_loader): # 用enumerate()函数将train_loader转换成索引-数据对
             images = images.float().to(device)  # 将数据加载到device中
-            labels = labels.to(device)  # 将数据加载到device中
+            labels = labels.long().to(device)  # 将数据加载到device中
+            print("images.shape: ", images.shape)
+            print("labels.shape: ", labels.shape)
 
             # 前向传播
             outputs = model(images) # outputs的shape为(batch_size, 10)
             loss = criterion(outputs, labels)
+            print("loss: ", loss.item())
 
             # 反向传播和优化
             optimizer.zero_grad()   # 将梯度归零
@@ -95,8 +100,8 @@ def test():
         correct = 0
         total = 0
         for images, labels in test_loader:
-            images = images.to(device)  # 将数据加载到device中
-            labels = labels.to(device)  # 将数据加载到device中
+            images = images.float().to(device)  # 将数据加载到device中
+            labels = labels.long().to(device)  # 将数据加载到device中
             outputs = model(images)
             _, predicted = torch.max(outputs.data, dim=1) # 取得分最高的那个类
             total += labels.size(0) # labels.size(0)为batch_size
