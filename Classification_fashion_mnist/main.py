@@ -13,8 +13,8 @@ num_classes = 10
 batch_size = 100
 learning_rate = 0.001
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-# device = torch.device('cpu')
+# device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cpu')
 print("use device: ", device)
 
 # 读取npy数据
@@ -65,25 +65,25 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)    # Adam优�
 
 # 训练模型
 def train():
-    total_step = len(train_loader)  # 计算总共有多少个batch
+    total_step = len(train_loader)  # 计算每个epoch的batch数量
     for epoch in range(num_epochs):
         for i, (images, labels) in enumerate(train_loader): # 用enumerate()函数将train_loader转换成索引-数据对
             images = images.float().to(device)  # 将数据加载到device中
             labels = labels.long().to(device)  # 将数据加载到device中
-            print("images.shape: ", images.shape)
-            print("labels.shape: ", labels.shape)
+            # print("images.shape: ", images.shape)
+            # print("labels.shape: ", labels.shape)
 
             # 前向传播
             outputs = model(images) # outputs的shape为(batch_size, 10)
             loss = criterion(outputs, labels)
-            print("loss: ", loss.item())
+            # print("loss: ", loss.item())
 
             # 反向传播和优化
             optimizer.zero_grad()   # 将梯度归零
             loss.backward() # 反向传播计算梯度
             optimizer.step()    # 更新参数
 
-            if (i+1) % 10 == 0:    # 每1个batch打印一次日志
+            if (i+1) % 100 == 0:    # 每1个batch打印一次日志
                 print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'
                     .format(epoch+1, num_epochs, i+1, total_step, loss.item()))
     
