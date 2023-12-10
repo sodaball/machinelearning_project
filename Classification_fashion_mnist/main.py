@@ -4,6 +4,14 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
+from model import CNN   # 导入model.py中定义的CNN类
+import os
+
+# 定义超参数
+num_epochs = 10
+num_classes = 10
+batch_size = 64
+learning_rate = 0.001
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print("use device: ", device)
@@ -45,50 +53,57 @@ test_dataset = FashionMNISTDataset(test_images, test_labels)    # 传入numpy格
 # 定义数据加载器
 # 用torch.utils.data.DataLoader定义数据加载器
 # 不用重新写DataLoader类，torch.utils.data.DataLoader已经定义好了，直接调用即可
-train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
-test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False)
+train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
+test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
 
-# 定义网络模型, 用于MNIST分类
-class CNN(nn.Module):
-    # __init__方法是类的构造函数，用于初始化类的成员
-    # forward方法定义了数据流向，即数据如何在网络层间传递
-    # forward使用__init__中定义的网络层
-    def __init__(self):
-        super(CNN, self).__init__() # 调用父类的构造函数
-        # 三层卷积层，卷积层使用批量归一化，两层池化层，两层全连接层
-        self.layer1 = nn.Sequential(
-            nn.Conv2d(in_channels=1, out_channels=16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),   # （bachsize, 1, 28, 28）->（bachsize, 16, 28, 28）
-            # in_channels为输入的通道数, in_channels=1因为fashion-mnist的图片是灰度图，只有一个通道
-            # out_channels为卷积核的数量, kernel_size为卷积核的大小, stride为步长, padding为填充, padding=(kernel_size-1)/2
-            # stride=(1, 1)表示水平和竖直方向的步长都为1，padding=(1, 1)表示在水平和竖直方向都填充1个像素
-            # padding=(input_size - kernel_size + 2*padding)/stride + 1, 这样卷积后的输出大小和输入大小相同(28*28)
-            # 卷积核的大小一般为奇数，这样才能保证padding为整数
-            nn.BatchNorm2d(num_features=16),    # (bachsize, 16, 28, 28) -> (bachsize, 16, 28, 28)
-            nn.ReLU(),  # （bachsize, 16, 28, 28）->（bachsize, 16, 28, 28）
-            nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2))   # （bachsize, 16, 28, 28）->（bachsize, 16, 14, 14）
-        )
+# 定义网络模型
+model = CNN().to(device)    # 将模型加载到device中，即加载到GPU或CPU中
 
-        self.layer2 = nn.Sequential(
-            nn.Conv2d(in_channels=16, out_channels=32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),  # （bachsize, 16, 14, 14）->（bachsize, 32, 14, 14）
-            nn.BatchNorm2d(num_features=32),    # （bachsize, 32, 14, 14）->（bachsize, 32, 14, 14）
-            nn.ReLU(),  # （bachsize, 32, 14, 14）->（bachsize, 32, 14, 14）
-            nn.MaxPool2d(kernel_size=(2, 2), stride=(2, 2))  # （bachsize, 32, 14, 14）->（bachsize, 32, 7, 7）
-        )
+# 定义损失函数和优化器
+criterion = nn.CrossEntropyLoss()   # 交叉熵损失函数
+optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)    # Adam优化器
 
-        self.layer3 = nn.Sequential(
-            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),  # （bachsize, 32, 7, 7）->（bachsize, 64, 7, 7）
-            nn.BatchNorm2d(num_features=64),    # （bachsize, 64, 7, 7）->（bachsize, 64, 7, 7）
-            nn.ReLU()   # （bachsize, 64, 7, 7）->（bachsize, 64, 7, 7）
-        )
+# 训练模型
+total_step = len(train_loader)  # 计算batch数量
 
-        self.fc1 = nn.Linear(in_features=64*7*7, out_features=128)  # （bachsize, 64*7*7）->（bachsize, 128）
-        self.fc2 = nn.Linear(in_features=128, out_features=10)  # （bachsize, 128）->（bachsize, 10）
+for epoch in range(num_epochs):
+    for i, (images, labels) in enumerate(train_loader):    # 从train_loader中获取一个batch的数据
+        # 将数据加载到device中
+        images = images.to(device)
+        labels = labels.to(device)
 
-    def forward(self, x):   # 定义数据流向，即数据如何在网络层间传递
-        x = self.layer1(x)
-        x = self.layer2(x)
-        x = self.layer3(x)
-        x = x.view(x.size(0), -1)   # 因为全连接层的输入是一维的，所以需要将卷积层的输出拉平
-        x = self.fc1(x)
-        x = self.fc2(x)
-        return x
+        # 前向传播
+        outputs = model(images)
+        loss = criterion(outputs, labels)   # 计算损失函数
+
+        # 反向传播和优化
+        optimizer.zero_grad()   # 梯度清零
+        loss.backward() # 反向传播
+        optimizer.step()    # 优化器更新参数
+
+        if (i+1) % 100 == 0:    # 每100个batch打印一次信息
+            print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'
+                  .format(epoch+1, num_epochs, i+1, total_step, loss.item()))
+
+# 测试模型
+model.eval()    # 模型转为评估模式
+with torch.no_grad():   # 不计算梯度
+    correct = 0
+    total = 0
+    for images, labels in test_loader:  # 从test_loader中获取一个batch的数据
+        # 将数据加载到device中
+        images = images.to(device)
+        labels = labels.to(device)
+
+        # 前向传播
+        outputs = model(images) # outputs的shape为(batch_size, 10)
+        _, predicted = torch.max(outputs.data, dim=1) # 获取每一行的最大值和最大值的索引, predicted的shape为(batch_size, 1)
+        total += labels.size(0) # labels.size(0)为batch_size
+        correct += (predicted == labels).sum().item()   # 判断预测值和真实值是否相等，相等为1，不相等为0，最后求和
+
+    print('Accuracy of the network on the 10000 test images: {} %'.format(100 * correct / total))
+
+# 保存模型
+if os.path.exists('./model') is False:
+    os.mkdir('./model')
+torch.save(model.state_dict(), './model/model.ckpt')  # 保存模型参数
