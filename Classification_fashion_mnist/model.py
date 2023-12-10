@@ -3,12 +3,12 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 # 定义网络模型, 用于MNIST分类
-class CNN(nn.Module):
+class CNN_model(nn.Module):
     # __init__方法是类的构造函数，用于初始化类的成员
     # forward方法定义了数据流向，即数据如何在网络层间传递
     # forward使用__init__中定义的网络层
     def __init__(self):
-        super(CNN, self).__init__() # 调用父类的构造函数
+        super(CNN_model, self).__init__() # 调用父类的构造函数
         # 三层卷积层，卷积层使用批量归一化，两层池化层，两层全连接层
         self.layer1 = nn.Sequential(
             nn.Conv2d(in_channels=1, out_channels=16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1)),   # （bachsize, 1, 28, 28）->（bachsize, 16, 28, 28）
