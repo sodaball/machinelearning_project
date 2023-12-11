@@ -27,8 +27,17 @@ FashionMNIST 的大小、格式和训练集/测试集划分与原始的 MNIST �
 
 
 
-
 ## 步骤：
+
+### 训练结果
+
+![loss](./images/loss.png)
+
+![acc](./images/acc.png)
+
+
+
+
 
 ### 错误记录
 
@@ -114,7 +123,6 @@ def train():
 
 ```python
 labels = labels.long().to(device)
-
 ```
 
 
