@@ -6,9 +6,10 @@ import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 from model import CNN_model   # 导入model.py中定义的CNN类
 import os
+import matplotlib.pyplot as plt
 
 # 定义超参数
-num_epochs = 10
+num_epochs = 20
 num_classes = 10
 batch_size = 100
 learning_rate = 0.001
@@ -52,7 +53,7 @@ test_dataset = FashionMNISTDataset(test_images, test_labels)    # 传入numpy格
 # 定义数据加载器
 # 用torch.utils.data.DataLoader定义数据加载器
 # 不用重新写DataLoader类，torch.utils.data.DataLoader已经定义好了，直接调用即可
-train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
+train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)   # 此处数据是numpy, 不是tensor
 test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
 
 # 定义网络模型
@@ -62,6 +63,9 @@ print(model)
 # 定义损失函数和优化器
 criterion = nn.CrossEntropyLoss()   # 交叉熵损失函数
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)    # Adam优化器
+
+# 保存loss曲线，用于后续绘图
+loss_list = []
 
 # 训练模型
 def train():
@@ -76,6 +80,7 @@ def train():
             # 前向传播
             outputs = model(images) # outputs的shape为(batch_size, 10)
             loss = criterion(outputs, labels)
+            loss_list.append(loss.item())
             # print("loss: ", loss.item())
 
             # 反向传播和优化
@@ -83,14 +88,22 @@ def train():
             loss.backward() # 反向传播计算梯度
             optimizer.step()    # 更新参数
 
-            if (i+1) % 100 == 0:    # 每1个batch打印一次日志
+            if (i+1) % 10 == 0:    # 每1个batch打印一次日志
                 print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'
                     .format(epoch+1, num_epochs, i+1, total_step, loss.item()))
-    
+
     # 保存模型
     if not os.path.exists('./model'):  # 如果./model文件夹不存在，则创建
         os.makedirs('./model')
     torch.save(model.state_dict(), './model/model.ckpt')   # 保存模型参数
+
+    # 保存loss曲线图片
+    plt.plot(loss_list)
+    plt.xlabel('Iteration')
+    plt.ylabel('Loss')
+    plt.title('Loss curve')
+    plt.savefig('./images/loss.png')
+    plt.show()
 
 # 测试模型
 def test():
@@ -110,6 +123,7 @@ def test():
 
 if __name__ == '__main__':  # 如果模块是被直接运行的，则代码块被运行，如果模块是被导入的，则代码块不被运行
     print("Executing training...")
-    train()
+    train(
     print("Executing testing...")
     test()
+    
