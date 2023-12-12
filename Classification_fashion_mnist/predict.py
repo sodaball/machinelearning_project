@@ -23,7 +23,7 @@ model.load_state_dict(torch.load('./model/model.ckpt'))
 model.eval()
 
 # 读取一张图片并进行预测
-image_path = './web_scraper/img_save/5.jpg'  # 替换为图片路径
+image_path = './data/5.jpg'  # 替换为图片路径
 image = process_image(image_path)
 with torch.no_grad():
     output = model(image.float())
