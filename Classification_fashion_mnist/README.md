@@ -251,6 +251,8 @@ def test():
 
 该文件首先处理单张图片，将其处理成能都匹配model的输入，能输出该图片的分类结果和每个类别的概率。
 
+![inference](images/inference.png)
+
 
 
 #### 训练与推理的关系
